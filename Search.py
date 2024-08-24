@@ -265,3 +265,5 @@ for k, v in towns.items():
 for city in ["lethbridge", "calagary"]:
     pass
 main("ab", "lethbridge")
+
+print("wow that was slow")
