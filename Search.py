@@ -98,8 +98,8 @@ def deep_search(link):
     home["Description"] = (des.get_text())
     home["Link"] = link
     try:
-        print(f"Address: {home["Address"]}, SQFT: {home["SQFT"]}, Beds: {home["Beds"]}, Baths: {home["Baths"]}, Type: {home["Type"]}, Subdivision: {home["Subdivision"]}")
-        return home, mls
+        if home["Address"] and home["SQFT"] and home["Beds"] and home["Baths"] and home["Type"] and home["Subdivision"]:
+            return home, mls
     except KeyError:
         pass
 
