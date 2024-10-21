@@ -131,8 +131,9 @@ def main(abb, city):
     for page in range(1, 20, 1):
         try:
             url = f"https://www.remax.ca/{abb}/{city}-real-estate?lang=en&pageNumber={page}&pricePerSqftMin=1&sqftMin=1&bedsMin=2&bathsMin=1&pageNumber=1&priceMin=1&priceMax=&pricePerSqftMax=&priceType=0&sqftMax=&lotSizeMin=&lotSizeMax=&bedsMax=4&featuredListings=&isRemaxListing=false&comingSoon=false&updatedInLastNumDays=&featuredLuxury=false&minImages=&house=false&townhouse=false&condo=false&rental=false&land=false&farm=false&duplex=false&cottage=false&other=false&commercial=false&commercialLease=false&vacantLand=false&hotelResort=false&businessOpportunity=false&rentalsOnly=false&commercialOnly=false&luxuryOnly=false&hasOpenHouse=false&hasVirtualOpenHouse=false&parkingSpacesMin=&parkingSpacesMax=&commercialSqftMin=&commercialSqftMax=&unitsMin=&unitsMax=&storiesMin=&storiesMax=&totalAcresMin=&totalAcresMax=&Agriculture=false&Automotive=false&Construction=false&Grocery=false&Hospitality=false&Hotel=false&Industrial=false&Manufacturing=false&Multi-Family=false&Office=false&Professional=false&Restaurant=false&Retail=false&Service=false&Transportation=false&Warehouse=false"
-            data = requests.get(url)
-            #print(url)
+            data = requests.get(url) #Getting the Website
+            
+            # Making sure we don't search the same page again 
             if data == old_data:
                 break
             else:
@@ -144,9 +145,11 @@ def main(abb, city):
             print(str(e))
             break
 
+        # Webscraping
         html = BeautifulSoup(data.text, 'html.parser')
         houses = html.find_all('a', class_ = "listing-card_listingCard__lc4CL", limit=20)
         
+        #Going through each house we get
         for house in houses:
             c+=1
             link = house.attrs['href']
@@ -155,7 +158,6 @@ def main(abb, city):
                 if home_data and mls:
                     if not document_exists(homes, mls):  # Check if document with MLS number exists
                         homes.document(mls).set(home_data)
-
             except TypeError:
                 pass
     
@@ -165,6 +167,7 @@ def get_ranges(homes, percentage, Property_Type):
     ranges = []
     docs = homes.stream()
     
+    # Each house that is already saved
     for doc in docs:
         v = doc.to_dict()
         try:
@@ -180,6 +183,7 @@ def get_ranges(homes, percentage, Property_Type):
         found = False
         for how in ranges:
             try:
+                # seeing if it fits into a range we currently have
                 if (    
                         how['SQFT']["Min"] <= sqf and how["SQFT"]['Max'] >= sqf and 
                         how['Beds']["Min"] <=  beds and how['Beds']["Max"] >= beds and
@@ -193,7 +197,8 @@ def get_ranges(homes, percentage, Property_Type):
             
             except KeyError:
                 continue
-        
+
+        # Creating a new range
         if not found:
             values = {
                 "Basement": basement,
@@ -214,7 +219,9 @@ def get_ranges(homes, percentage, Property_Type):
                 'Count': 1,
                 "Type": type if type == "House" else "",
             }
+
             ranges.append(values)
+    
     docs2 = homes.stream()
     for doc in docs2:
         f = doc.to_dict()
